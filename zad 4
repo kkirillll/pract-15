@@ -1,1 +1,95 @@
+using System;
+namespace zad4;
+public interface IAttacker
+{
+    void Attack();
+}
+public interface IHealer
+{
+    void Heal();
+}
+public class Warrior : IAttacker
+{
+    public string Name { get; set; }
 
+    public Warrior(string name)
+    {
+        Name = name;
+    }
+    public void Attack()
+    {
+        Console.WriteLine($"{Name} атакует мечом!");
+    }
+}
+public class Mage : IAttacker, IHealer
+{
+    public string Name { get; set; }
+
+    public Mage(string name)
+    {
+        Name = name;
+    }
+    public void Attack()
+    {
+        Console.WriteLine($"{Name} бросает огненный шар!");
+    }
+    public void Heal()
+    {
+        Console.WriteLine($"{Name} исцеляет раны магией!");
+    }
+}
+
+public class Priest : IHealer
+{
+    public string Name { get; set; }
+
+    public Priest(string name)
+    {
+        Name = name;
+    }
+
+    public void Heal()
+    {
+        Console.WriteLine($"{Name} молится за исцеление!");
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine("=== ИГРОКИ И СПОСОБНОСТИ ===\n");
+        Warrior warrior = new Warrior("Артур");
+        Mage mage = new Mage("Мерлин");
+        Priest priest = new Priest("Бенедикт");
+
+        IAttacker[] attackers = new IAttacker[] { warrior, mage };
+
+        IHealer[] healers = new IHealer[] { mage, priest };
+
+        Console.WriteLine("=== ВСЕ, КТО УМЕЕТ АТАКОВАТЬ ===");
+        foreach (var attacker in attackers)
+        {
+            attacker.Attack();
+        }
+
+        Console.WriteLine("\n=== ВСЕ, КТО УМЕЕТ ЛЕЧИТЬ ===");
+        foreach (var healer in healers)
+        {
+            healer.Heal();
+        }
+
+        Console.WriteLine("\n=== ДЕМОНСТРАЦИЯ ВСЕХ ПЕРСОНАЖЕЙ ===");
+        Console.WriteLine("Воин:");
+        warrior.Attack();
+
+        Console.WriteLine("\nМаг:");
+        mage.Attack();
+        mage.Heal();
+
+        Console.WriteLine("\nЖрец:");
+        priest.Heal();
+
+        Console.ReadLine();
+    }
+}
