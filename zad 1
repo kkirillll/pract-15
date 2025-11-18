@@ -1,0 +1,86 @@
+using System;
+namespace zad1;
+
+public interface IWorkable
+{
+    void DoWork();
+}
+public interface IRechargeable
+{
+    void Recharge();
+}
+public class Robot : IWorkable, IRechargeable
+{
+    public string Name { get; set; }
+    private int energy;
+
+    public int Energy
+    {
+        get { return energy; }
+        private set
+        {
+            if (value < 0)
+                energy = 0;
+            else if (value > 100)
+                energy = 100;
+            else
+                energy = value;
+        }
+    }
+
+    public Robot(string name, int initialEnergy)
+    {
+        Name = name;
+        Energy = initialEnergy;
+    }
+    public void DoWork()
+    {
+        if (Energy > 0)
+        {
+            Energy -= 20;
+            Console.WriteLine($"{Name} выполнил работу. Энергия: {Energy}%");
+        }
+        else
+        {
+            Console.WriteLine($"{Name} не может работать - нет энергии!");
+        }
+    }
+    public void Recharge()
+    {
+        Energy += 50;
+        Console.WriteLine($"{Name} зарядился. Энергия: {Energy}%");
+    }
+}
+public class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine("=== РОБОТЫ НА ЗАВОДЕ ===\n");
+        Robot robot = new Robot("R2-D2", 60);
+
+        Console.WriteLine("Начальное состояние:");
+        Console.WriteLine($"{robot.Name} - энергия: {robot.Energy}%\n");
+
+        Console.WriteLine("=== ВЫПОЛНЕНИЕ РАБОТЫ ===");
+        robot.DoWork(); 
+        robot.DoWork();
+
+        Console.WriteLine("\n=== ЗАРЯДКА ===");
+        robot.Recharge(); 
+
+        Console.WriteLine("\n=== ВЫПОЛНЕНИЕ РАБОТЫ ПОСЛЕ ЗАРЯДКИ ===");
+        robot.DoWork(); 
+        Console.WriteLine("\n=== ТЕСТИРОВАНИЕ ГРАНИЧНЫХ ЗНАЧЕНИЙ ===");
+        robot.DoWork(); 
+        robot.DoWork(); 
+        robot.DoWork(); 
+        robot.DoWork();
+
+        Console.WriteLine("\n=== ПОЛНАЯ ЗАРЯДКА ===");
+        robot.Recharge(); 
+        robot.Recharge();
+        robot.Recharge(); 
+
+        Console.ReadLine();
+    }
+}
