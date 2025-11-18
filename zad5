@@ -1,0 +1,154 @@
+using System;
+
+namespace zad5;
+public interface IBankAccount
+{
+    void Deposit(decimal amount);
+    void Withdraw(decimal amount);
+}
+
+public interface ITransferable
+{
+    void TransferTo(decimal amount, IBankAccount targetAccount);
+}
+
+public class BankAccount : IBankAccount, ITransferable
+{
+    public string AccountNumber { get; set; }
+    public string OwnerName { get; set; }
+    private decimal balance;
+
+    public decimal Balance
+    {
+        get { return balance; }
+        private set
+        {
+            if (value < 0)
+                throw new ArgumentException("Баланс не может быть отрицательным");
+            balance = value;
+        }
+    }
+
+    public BankAccount(string accountNumber, string ownerName, decimal initialBalance = 0)
+    {
+        AccountNumber = accountNumber;
+        OwnerName = ownerName;
+        Balance = initialBalance;
+    }
+
+    public void Deposit(decimal amount)
+    {
+        if (amount <= 0)
+        {
+            Console.WriteLine($"Ошибка: Сумма внесения должна быть положительной ({amount:C})");
+            return;
+        }
+
+        Balance += amount;
+        Console.WriteLine($"На счёт {AccountNumber} внесено: {amount:C}. Новый баланс: {Balance:C}");
+    }
+
+    public void Withdraw(decimal amount)
+    {
+        if (amount <= 0)
+        {
+            Console.WriteLine($"Ошибка: Сумма снятия должна быть положительной ({amount:C})");
+            return;
+        }
+
+        if (amount > Balance)
+        {
+            Console.WriteLine($"Ошибка: Недостаточно средств на счёте {AccountNumber}. Запрошено: {amount:C}, доступно: {Balance:C}");
+            return;
+        }
+
+        Balance -= amount;
+        Console.WriteLine($"Со счёта {AccountNumber} снято: {amount:C}. Новый баланс: {Balance:C}");
+    }
+
+    public void TransferTo(decimal amount, IBankAccount targetAccount)
+    {
+        if (amount <= 0)
+        {
+            Console.WriteLine($"Ошибка: Сумма перевода должна быть положительной ({amount:C})");
+            return;
+        }
+
+        if (amount > Balance)
+        {
+            Console.WriteLine($"Ошибка перевода: Недостаточно средств на счёте {AccountNumber}. Запрошено: {amount:C}, доступно: {Balance:C}");
+            return;
+        }
+
+        if (targetAccount == null)
+        {
+            Console.WriteLine("Ошибка: Целевой счёт не указан");
+            return;
+        }
+
+        Balance -= amount;
+
+        targetAccount.Deposit(amount);
+
+        Console.WriteLine($"Перевод выполнен: {amount:C} с {AccountNumber} на счёт получателя. Ваш новый баланс: {Balance:C}");
+    }
+
+    public void DisplayInfo()
+    {
+        Console.WriteLine($"Счёт: {AccountNumber}, Владелец: {OwnerName}, Баланс: {Balance:C}");
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine("=== БАНК И ПЕРЕВОДЫ ===\n");
+
+        BankAccount account1 = new BankAccount("40702810000000000001", "Иван Иванов", 1000);
+        BankAccount account2 = new BankAccount("40702810000000000002", "Петр Петров", 500);
+
+        Console.WriteLine("=== НАЧАЛЬНОЕ СОСТОЯНИЕ СЧЁТОВ ===");
+        account1.DisplayInfo();
+        account2.DisplayInfo();
+
+        Console.WriteLine("\n=== ОПЕРАЦИИ ПО СЧЕТАМ ===");
+
+        account1.Deposit(200);
+        account2.Deposit(100);
+
+        account1.Withdraw(150);
+        account2.Withdraw(50);
+
+        Console.WriteLine("\n=== ПЕРЕВОДЫ МЕЖДУ СЧЕТАМИ ===");
+
+        Console.WriteLine("--- Перевод 300 рублей ---");
+        account1.TransferTo(300, account2);
+
+        Console.WriteLine("\n--- Состояние после перевода ---");
+        account1.DisplayInfo();
+        account2.DisplayInfo();
+        Console.WriteLine("\n--- Попытка перевода 2000 рублей (недостаточно средств) ---");
+        account1.TransferTo(2000, account2);
+        Console.WriteLine("\n--- Попытка перевода -100 рублей ---");
+        account1.TransferTo(-100, account2);
+        Console.WriteLine("\n--- Перевод 100 рублей обратно ---");
+        account2.TransferTo(100, account1);
+
+        Console.WriteLine("\n=== ФИНАЛЬНОЕ СОСТОЯНИЕ СЧЁТОВ ===");
+        account1.DisplayInfo();
+        account2.DisplayInfo();
+        Console.WriteLine("\n=== РАБОТА С МАССИВОМ СЧЁТОВ ===");
+        IBankAccount[] accounts = new IBankAccount[] { account1, account2 };
+
+        foreach (var account in accounts)
+        {
+            account.Deposit(50); 
+        }
+        Console.WriteLine("\n=== СОСТОЯНИЕ ПОСЛЕ МАССОВОГО ПОПОЛНЕНИЯ ===");
+        account1.DisplayInfo();
+        account2.DisplayInfo();
+
+        Console.ReadLine();
+    }
+}
