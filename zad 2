@@ -1,0 +1,137 @@
+using System;
+using System.Collections.Generic;
+
+namespace zad2;
+public interface ITurnable
+{
+    void TurnOn();
+    void TurnOff();
+}
+
+public interface ILevelSettable
+{
+    void SetLevel(int level);
+}
+
+public class Lamp : ITurnable, ILevelSettable
+{
+    private int level;
+
+    public string Name { get; set; }
+
+    public int Level
+    {
+        get { return level; }
+        private set
+        {
+            if (value < 0)
+                level = 0;
+            else if (value > 100)
+                level = 100;
+            else
+                level = value;
+        }
+    }
+
+    public bool IsOn => Level > 0;
+
+    public Lamp(string name)
+    {
+        Name = name;
+        Level = 0;
+    }
+
+    public void TurnOn()
+    {
+        Level = 100;
+        Console.WriteLine($"{Name}: включена, уровень яркости {Level}%");
+    }
+
+    public void TurnOff()
+    {
+        Level = 0;
+        Console.WriteLine($"{Name}: выключена");
+    }
+
+    public void SetLevel(int level)
+    {
+        Level = level;
+        Console.WriteLine($"{Name}: уровень установлен на {Level}%");
+    }
+
+    public void DisplayStatus()
+    {
+        Console.WriteLine($"{Name}: {(IsOn ? "ВКЛ" : "ВЫКЛ")}, уровень: {Level}%");
+    }
+}
+public class Fan : ITurnable
+{
+    public string Name { get; set; }
+
+    public bool IsOn { get; private set; }
+
+    public Fan(string name)
+    {
+        Name = name;
+        IsOn = false;
+    }
+    public void TurnOn()
+    {
+        IsOn = true;
+        Console.WriteLine($"{Name}: включен");
+    }
+
+    public void TurnOff()
+    {
+        IsOn = false;
+        Console.WriteLine($"{Name}: выключен");
+    }
+
+    public void DisplayStatus()
+    {
+        Console.WriteLine($"{Name}: {(IsOn ? "ВКЛ" : "ВЫКЛ")}");
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine("=== УМНЫЙ ДОМ ===\n");
+        Lamp livingRoomLamp = new Lamp("Лампа в гостиной");
+        Fan bedroomFan = new Fan("Вентилятор в спальне");
+
+        List<ITurnable> devices = new List<ITurnable> { livingRoomLamp, bedroomFan };
+
+        Console.WriteLine("=== ВКЛЮЧЕНИЕ ВСЕХ УСТРОЙСТВ ===");
+        foreach (var device in devices)
+        {
+            device.TurnOn();
+        }
+
+        Console.WriteLine("\n=== УПРАВЛЕНИЕ УРОВНЕМ ЛАМПЫ ===");
+        livingRoomLamp.SetLevel(30);
+
+        Console.WriteLine("\n=== ТЕКУЩЕЕ СОСТОЯНИЕ УСТРОЙСТВ ===");
+        livingRoomLamp.DisplayStatus();
+        bedroomFan.DisplayStatus();
+
+        Console.WriteLine("\n=== ВЫКЛЮЧЕНИЕ ВСЕХ УСТРОЙСТВ ===");
+        foreach (var device in devices)
+        {
+            device.TurnOff();
+        }
+
+        Console.WriteLine("\n=== ФИНАЛЬНОЕ СОСТОЯНИЕ УСТРОЙСТВ ===");
+        livingRoomLamp.DisplayStatus();
+        bedroomFan.DisplayStatus();
+
+        Console.WriteLine("\n=== ДОПОЛНИТЕЛЬНОЕ ТЕСТИРОВАНИЕ ЛАМПЫ ===");
+        livingRoomLamp.TurnOn();
+        livingRoomLamp.SetLevel(75);
+        livingRoomLamp.SetLevel(150);
+        livingRoomLamp.SetLevel(-10);
+
+        Console.ReadLine();
+    }
+}
